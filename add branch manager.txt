@@ -1,0 +1,61 @@
+{% extends "index.html" %}
+{% block body %}
+<U><B><h1 align="center"> ADD BRANCH MANAGER</h1></B></U>
+<form action="/myapp/adm_add_branch_manager/" enctype="multipart/form-data" method="post">
+{% csrf_token %}
+<br>
+<br>
+<table width="200" border="3" align="center">
+  <tr>
+    <td><strong>Branch</strong></td>
+    <td> <strong><select name="branches">
+        {% for i in data %}
+            <option value="{{ i.id }}">{{ i.branch_name }}</option>
+
+
+        {% endfor %}
+    </select></strong></td>
+  </tr>
+</table>
+
+<table width="400" border="4" align="center">
+<tr>
+    <td><strong>Manager Name</strong></td>
+    <td>&nbsp;<input name="manager_name" type="text" pattern="[a-zA-Z]+" required/></td>
+  </tr>
+  <tr>
+    <td><strong>House Name</strong></td>
+    <td>&nbsp;<input name="house_name" type="text" pattern="[a-zA-Z]+" required /></td>
+  </tr>
+  <tr>
+    <td><strong>Place</strong></td>
+    <td>&nbsp;<input name="place" type="text" pattern="[a-zA-Z]+" required /></td>
+  </tr>
+  <tr>
+    <td><strong>City</strong></td>
+    <td>&nbsp;<input name="city" type="text" pattern="[a-zA-Z]+" required/></td>
+  </tr>
+  <tr>
+    <td><strong>Phone No</strong></td>
+    <td>&nbsp;<input name="phone_no" type="text"  pattern="[789][0-9]{9}"required /></td>
+  </tr>
+     <tr>
+    <td><strong>Age</strong></td>
+    <td>&nbsp;<input name="age" type="text"  pattern="[1-9]+"  required/></td>
+  </tr>
+  <tr>
+    <td><strong>Email</strong></td>
+    <td>&nbsp;<input name="email" type="email"  pattern=" /^[a-z]A-Z0-9.!#$%&'*+/=?^_`{|}~]+@[a-zA-Z0-9-]+)*$/"  required /></td>
+  </tr>
+  <tr>
+    <td><strong>Image</strong></td>
+    <td><input name="image" type="file" required/></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td><strong><input name="add_branch_manager" type="submit"  value="Add"> </strong></td>
+  </tr>
+</table>
+
+</form>
+{% endblock %}
