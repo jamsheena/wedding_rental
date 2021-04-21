@@ -1,0 +1,38 @@
+{% extends "manager_index.html" %}
+{% block body %}
+    <b><u><h1 align="center"> Stock Updating</h1></u></b>
+
+<form action="/myapp/branch_manager_stock_add/" method="post">
+{% csrf_token %}
+
+<BR>
+<br>
+<br>
+<br>
+<br>
+<table class="table table-hover">
+  <tr>
+    <td><strong>Item Name</strong></td>
+
+      <td>{{ data.item_name }}  </td>
+  </tr>
+
+
+  </table>
+  <table   class="table table-hover" >
+<tr>
+<td><strong>Current Quantity</strong><input type="hidden" value="{{ itemid }}" name="itemid"></td>
+    <td>&nbsp;{{ data.item_quantity }}</td>
+  </tr>
+  <tr>
+    <td><strong>Update Quantity</strong></td>
+    <td>&nbsp;<input name="new_qty" type="text"  class="form-control" /></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td><strong><input name="update" type="submit"     class="btn btn-success"  value="Update"/> </strong></td>
+  </tr>
+</table>
+</form>
+
+{% endblock %}
