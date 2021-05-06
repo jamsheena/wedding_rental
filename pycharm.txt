@@ -1,0 +1,39 @@
+def and_viewrating(request):
+    itemid=request.POST['ITEM_ID']
+    rating_obj =rating.objects.filter(ITEM_ID_id=itemid)
+    ar=[]
+    for i in rating_obj:
+        s = {'name': i.CUSTOMER_ID.name, 'rating': i.rating,'review':i.review}
+        ar.append(s)
+    if len(ar) > 0:
+        return JsonResponse({'status': 'ok', 'data': ar})
+    else:
+        return JsonResponse({'status': 'no'})
+
+
+def and_addrating(request):
+    lid = request.POST['lid']
+    log_obj = login.objects.get(id=lid)
+    customer_obj = customer.objects.get(LOGIN_ID=log_obj)
+    itemid = request.POST['ITEM_ID']
+    rat=request.POST['rating']
+    review=request.POST['review']
+    rate_obj=rating.objects.filter(CUSTOMER_ID=customer_obj,ITEM_ID_id=itemid)
+    if rate_obj.exists():
+        rate_obj=rate_obj[0]
+        rate_obj.rating = rat
+        rate_obj.review = review
+        rate_obj.save()
+    else:
+
+
+        rating_obj=rating()
+        rating_obj.ITEM_ID_id=itemid
+        rating_obj.CUSTOMER_ID=customer_obj
+        rating_obj.rating=rat
+        rating_obj.review=review
+        rating_obj.save()
+    return JsonResponse({'status': 'ok'})
+
+
+

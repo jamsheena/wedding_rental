@@ -1,0 +1,41 @@
+{% extends "manager_index.html" %}
+{% block body %}
+
+<B><U><h1 align="center"> Damage Entry</h1></U></B>
+
+
+<form action="/myapp/branch_manager_b_damage_entry_post/" method="post">
+{% csrf_token %}
+<BR>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+
+
+
+<table class="table table-hover">
+
+
+
+
+
+<tr>
+<td><strong>Damage</strong></td>
+    <td>&nbsp;<input name="damage" type="text"  class="form-control" /></td>
+  </tr>
+  <tr>
+    <td><strong>Amount</strong></td>
+    <td>&nbsp;<input name="amount" type="text"  class="form-control"/></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td><strong><input name="submit" type="submit" class="btn btn-success" value="Submit"/> </strong></td>
+  </tr>
+</table>
+</form>
+{% endblock %}

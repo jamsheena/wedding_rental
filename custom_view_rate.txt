@@ -1,0 +1,77 @@
+package com.example.weddingrental;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.preference.PreferenceManager;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.RatingBar;
+import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
+
+public class custom_view_rate extends BaseAdapter {
+
+    String[] name, rate,review;
+    private Context context;
+
+    public custom_view_rate(Context appcontext, String[] name1, String[] rate1, String[] review1) {
+        this.context = appcontext;
+        this.name = name1;
+        this.rate = rate1;
+
+        this.review=review1;
+    }
+
+
+    @Override
+    public int getCount() {
+        return name.length;
+    }
+
+    @Override
+    public Object getItem(int i) {
+        return null;
+    }
+
+    @Override
+    public long getItemId(int i) {
+        return 0;
+    }
+
+    @Override
+    public View getView(int i, View view, ViewGroup viewGroup) {
+        LayoutInflater inflator = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        View gridView;
+        if (view == null) {
+            gridView = new View(context);
+            gridView = inflator.inflate(R.layout.custom_view_rate, null);
+
+        } else {
+            gridView = (View) view;
+
+        }
+
+        TextView tv2 = (TextView) gridView.findViewById(R.id.textView5);
+        TextView tv_review = (TextView) gridView.findViewById(R.id.textView98);
+
+        RatingBar rate_bar = (RatingBar) gridView.findViewById(R.id.ratingBar);
+
+
+        tv2.setText(name[i]);
+
+        tv_review.setTextColor(Color.BLACK);
+        tv_review.setText(review[i]);
+
+        rate_bar.setRating(Float.parseFloat(String.valueOf(rate[i])));
+
+
+
+        return gridView;
+    }
+}

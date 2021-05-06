@@ -1,0 +1,103 @@
+package com.example.weddingrental;
+
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.preference.PreferenceManager;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
+
+public class custom_orderstatus extends BaseAdapter {
+    String[] id,orderdate,status,total_amount;
+    private Context context;
+
+    public custom_orderstatus(Context appcontext, String[]id1, String[]orderdate1, String[] status1, String[] total_amount1)
+    {
+        this.context=appcontext;
+        this.id=id1;
+        this.orderdate=orderdate1;
+        this.status=status1;
+        this.total_amount=total_amount1;
+
+
+
+    }
+
+    @Override
+    public int getCount() {
+        return id.length;
+    }
+
+    @Override
+    public Object getItem(int i) {
+        return null;
+    }
+
+    @Override
+    public long getItemId(int i) {
+        return 0;
+    }
+
+    @Override
+    public View getView(int i, View view, ViewGroup viewGroup) {
+        LayoutInflater inflator=(LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        View gridView;
+        if(view==null)
+        {
+            gridView=new View(context);
+            //gridView=inflator.inflate(R.layout.customview, null);
+            gridView=inflator.inflate(R.layout.custom_orderstatus,null);
+
+        }
+        else
+        {
+            gridView=(View)view;
+
+        }
+        TextView tv_orderdate=(TextView)gridView.findViewById(R.id.editTextTextPersonName24);
+        TextView tv_status=(TextView)gridView.findViewById(R.id.editTextTextPersonName23);
+        TextView tv_total=(TextView)gridView.findViewById(R.id.textView9);
+
+        Button bt_viewitem=(Button) gridView.findViewById(R.id.button15);
+
+
+        bt_viewitem.setTag(i);
+        bt_viewitem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final int pos=(int)view.getTag();
+                final SharedPreferences sh = PreferenceManager.getDefaultSharedPreferences(context);
+                SharedPreferences.Editor editor = sh.edit();
+                editor.putString("orderid", id[pos]);
+                editor.putString("total_amount", total_amount[pos]);
+                editor.commit();
+
+                Intent i=new Intent(context,viewpurchaseditem.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(i);
+            }
+        });
+
+        tv_orderdate.setTextColor(Color.BLACK);
+        tv_orderdate.setText("Order date: "+orderdate[i]);
+
+        tv_status.setTextColor(Color.BLACK);
+        tv_status.setText("Status: "+status[i]);
+
+        tv_total.setTextColor(Color.BLACK);
+        tv_total.setText("Total amount: "+total_amount[i]);
+
+
+
+        return gridView;
+    }
+}

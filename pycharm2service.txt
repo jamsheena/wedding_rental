@@ -1,0 +1,820 @@
+import datetime
+from django.core.files.storage import FileSystemStorage
+from django.db.models import Q
+from django.http import HttpResponse,JsonResponse
+from django.shortcuts import render,redirect
+from .models import branch, branch_manager, login, category, subcategory, item, stock, customer, cart, order_master, \
+    order_sub, damage, rating
+
+
+# Create your views here.
+def adm_add_branch(request):
+    if request.method=="POST":
+        branchname=request.POST['branch_name']
+        place=request.POST['place']
+        city= request.POST['city']
+        phone=request.POST['phone_no']
+        image=request.FILES['image']
+        fs=FileSystemStorage()
+        filename=fs.save(image.name,image)
+        print(filename)
+
+        branch_obj=branch()
+        branch_obj.branch_name=branchname
+        branch_obj.branch_place=place
+        branch_obj.branch_city=city
+        branch_obj.branch_phone=phone
+        branch_obj.branch_image=fs.url(filename)
+        branch_obj.save()
+
+
+    return render(request,"adm/add_ branch.html")
+
+def adm_add_branch_manager(request):
+    if request.method=="POST":
+        branch_id=request.POST['branches']
+        b=branch.objects.get(pk=branch_id)
+
+
+
+
+
+        managername=request.POST['manager_name']
+        housename=request.POST['house_name']
+        place=request.POST['place']
+        city=request.POST['city']
+        phoneno=request.POST['phone_no']
+        age=request.POST['age']
+        email=request.POST['email']
+        image=request.FILES['image']
+        fs = FileSystemStorage()
+        filename = fs.save(image.name,image)
+
+        login_obj = login()
+        login_obj.username =email
+        login_obj.password="12"
+        login_obj.usertype="branchmanager"
+        login_obj.save()
+
+        manager_obj=branch_manager()
+        manager_obj.name= managername
+        manager_obj.house_name=housename
+        manager_obj.place=place
+        manager_obj.city=city
+        manager_obj.phone=phoneno
+        manager_obj.age=age
+        manager_obj.email=email
+        manager_obj.BRANCH_ID=b
+        manager_obj.LOGIN_ID=login_obj
+        manager_obj.image=fs.url(filename)
+        manager_obj.save()
+
+
+    branch_obj=branch.objects.all()
+    return render(request,"adm/add_branch_manager.html" ,{'data' : branch_obj})
+
+def adm_add_category(request):
+    if request.method=="POST":
+        categoryname=request.POST['category']
+
+        category_obj=category()
+        category_obj.category_name=categoryname
+        category_obj.save()
+
+    return render(request,"adm/add_category.html")
+
+
+def adm_add_Add_item(request):
+    if request.method=="POST":
+        itemname=request.POST['item_name']
+        itemprice=request.POST['item_price']
+        itemquantity=request.POST['item_quantity']
+        image = request.FILES['item_image']
+        fs = FileSystemStorage()
+        filename = fs.save(image.name, image)
+
+        # category_id = request.POST['category']
+        # c  =item.objects.filter(CATEGORY_ID=category.objects.get(pk=category_id))
+
+        subcategory_id=request.POST['subcategory']
+        sub_cat_obj = subcategory.objects.get(pk=subcategory_id)
+        item_obj = item()
+        item_obj.item_name = itemname
+        item_obj.item_price = itemprice
+        item_obj.item_quantity = itemquantity
+        item_obj.item_image = fs.url(filename)
+        item_obj.SUBCATEGORY_ID =sub_cat_obj
+        item_obj.save()
+
+    subcategory_obj=subcategory.objects.all()
+    category_obj = category.objects.all()
+    return render(request, "adm/Add_item.html", {'data': subcategory_obj, 'data1': category_obj})
+
+
+def adm_add_subcategory(request):
+    if request.method=="POST":
+        subcategoryname=request.POST['subcategory']
+        category_id=request.POST['category']
+        c=category.objects.get(pk=category_id)
+
+        subcategory_obj=subcategory()
+        subcategory_obj.subcategory_name=subcategoryname
+        subcategory_obj.CATEGORY_ID=c
+        subcategory_obj.save()
+
+    category_obj=category.objects.all()
+    return render(request,"adm/add_subcategory.html" ,{'data': category_obj})
+
+def adm_change_password(request):
+    return render(request,"adm/change_password.html")
+
+def adm_edit_branch(request,id):
+    branch_obj=branch.objects.get(id=id)
+    return render(request,"adm/edit_branch.html",{'data':branch_obj})
+
+def adm_updatetbranch(request):
+    branchname=request.POST['branch_name']
+    bplace=request.POST['place']
+    bcity=request.POST['city']
+    phone=request.POST['phone_no']
+    id=request.POST['hid']
+
+    branch_obj=branch.objects.get(id=id)
+    branch_obj.branch_name = branchname
+    branch_obj.branch_place = bplace
+    branch_obj.branch_city = bcity
+    branch_obj.branch_phone = phone
+    if 'branch_image' in request.FILES:
+        image=request.FILES['branch_image']
+        fs = FileSystemStorage()
+        filename = fs.save(image.name, image)
+        branch_obj.image=fs.url(filename)
+    branch_obj.save()
+    branch_obj=branch.objects.all()
+    return render(request, "adm/view_branch.html",{'data' : branch_obj})
+
+def adm_edit_branchmanager(request,id):
+    manager_obj=branch_manager.objects.get(id=id)
+    branch_obj=branch.objects.all()
+    return render(request,"adm/edit_branchmanager.html",{'data' : manager_obj,'data1':branch_obj})
+
+def adm_updatemanager(request):
+    managername=request.POST['name']
+    housename=request.POST['house_name']
+    place=request.POST['place']
+    city=request.POST['city']
+    phone_no=request.POST['phone_no']
+    Dob=request.POST['Dob']
+    email=request.POST['email']
+    id = request.POST['hid']
+
+    manager_obj=branch_manager.objects.get(id=id)
+    manager_obj.name=managername
+    manager_obj.house_name=housename
+    manager_obj.place=place
+    manager_obj.city=city
+    manager_obj.phone=phone_no
+    manager_obj.email=email
+    manager_obj.dob=Dob
+    if 'image' in request.FILES:
+        image = request.FILES['image']
+        fs = FileSystemStorage()
+        filename = fs.save(image.name, image)
+        manager_obj.image = fs.url(filename)
+    manager_obj.save()
+    manager_obj=branch_manager.objects.all()
+    return render(request, "adm/view_branch_manager.html", {'data': manager_obj})
+
+
+def adm_edit_category(request,id):
+    category_obj=category.objects.get(id=id)
+    return render(request,"adm/edit_category.html" ,{ 'data' : category_obj})
+
+def adm_updatecategory(requset):
+    categorynm=requset.POST['category']
+    id = requset.POST['hid']
+
+
+    category_obj=category.objects.get(id=str(id))
+    category_obj.category_name=categorynm
+    category_obj.save()
+    category_obj=category.objects.all()
+    return render(requset,"adm/view_category.html", {'data': category_obj})
+
+
+def adm_edit_item(request,id):
+    item_obj=item.objects.get(id=id)
+    category_obj=category.objects.all()
+    subcategory_obj=subcategory.objects.all()
+    return render(request,"adm/edit_item.html" ,{'data' : item_obj ,'data1':category_obj,'data2' : subcategory_obj})
+
+def adm_updateitem(request):
+    itemn=request.POST['item_name']
+    print('item_name')
+    price=request.POST['item_price']
+    qty=request.POST['item_quantity']
+    subcategory_id = request.POST['subcategory']
+    id = request.POST['hid']
+    item_obj = item.objects.get(id=str(id))
+    item_obj.item_name=itemn
+    item_obj.item_price=price
+    item_obj.item_quantity=qty
+    item_obj.save()
+    return redirect('myapp:adm_view_item')
+
+
+
+def adm_edit_subcategory(request,id):
+    subcategory_obj=subcategory.objects.get(id=id)
+    category_obj=category.objects.all()
+    # subcategory_obj=subcategory.objects.all()
+    print(category_obj)
+    return render(request,"adm/edit_subcategory.html" ,{'data': subcategory_obj ,'data1': category_obj})
+
+def adm_updatesubcategory(request):
+    subcategoryname=request.POST['subcategory']
+    id = request.POST['hid']
+    subcategory_obj = subcategory.objects.get(id=id)
+    subcategory_obj.subcategory_name=subcategoryname
+    subcategory_obj.save()
+    subcategory_obj=subcategory.objects.all()
+    category_obj=category.objects.all()
+    return render(request, "adm/view_subcategory.html", {'data': subcategory_obj ,'data1' :category_obj})
+
+
+
+def Login(request):
+    if request.method=="POST":
+        username=request.POST['username']
+        password=request.POST['password']
+        log_obj=login.objects.filter(username=username,password=password)
+        if log_obj.exists():
+            log=log_obj[0]
+            request.session['lid']=log.id
+            if log.usertype=="admin":
+
+                return render(request,"adm/homepage.html")
+            elif log.usertype=="branchmanager":
+                manager_obj=branch_manager.objects.get(LOGIN_ID=log)
+                request.session['manager_branch_id']=manager_obj.BRANCH_ID.id
+                return render(request,"branch_manager/managerhome.html")
+            else:
+                text="<script>alert('Invalid user');window.location='/myapp/';</script>"
+                return HttpResponse(text)
+        else:
+            text = "<script>alert('Invalid details');window.location='/myapp/';</script>"
+            return HttpResponse(text)
+    return render(request,"Login.html")
+
+
+
+def adm_purchased_item(request):
+    return render(request,"adm/purchased_item.html")
+
+def adm_review(request):
+    return render(request,"adm/review.html")
+
+def adm_view_branch(request):
+    if request.method=="POST":
+        branchsearch=request.POST['branch_name']
+        branch_obj=branch.objects.filter(branch_name__contains= branchsearch)
+        return render(request, "adm/view_branch.html", {'data': branch_obj})
+    branch_obj=branch.objects.all()
+    return render(request,"adm/view_branch.html",{'data':branch_obj})
+
+def adm_deletebranch(request,id):
+    branch_obj=branch.objects.get(id=id)
+    branch_obj.delete()
+    return adm_view_branch(request)
+
+
+
+
+def adm_view_branch_managerpost(request):
+    if request.method=="POST":
+        branchsearch=request.POST['branch']
+        manager_obj=branch_manager.objects.filter(BRANCH_ID__branch_name__contains=branchsearch)
+        return render(request,"adm/view_branch_manager.html", {'data' : manager_obj})
+
+def adm_view_branch_manager(request):
+
+
+        manager_obj=branch_manager.objects.all()
+        return render(request,"adm/view_branch_manager.html", {'data' : manager_obj})
+def adm_deletemanager(request,id):
+    branch_manager_obj=branch_manager.objects.get(id=id)
+    branch_manager_obj.delete()
+    return adm_view_branch_manager(request)
+
+def adm_view_category(request):
+    if request.method=="POST" :
+        pass
+
+    catall=category.objects.all()
+    return render(request,"adm/view_category.html",{'data': catall})
+
+def adm_deletecategory(request,id):
+    category_obj=category.objects.get(id=id)
+    category_obj.delete()
+    return adm_view_category(request)
+
+def adm_view_item(request):
+    if request.method=="POST":
+         btn=request.POST['button']
+         if btn=="Search":
+
+               subcatid=request.POST['subcategory']
+               subcategory_obj=subcategory.objects.get(id=subcatid)
+               item_obj=item.objects.filter(SUBCATEGORY_ID=subcategory_obj)
+         else :
+            itemname=request.POST['item']
+            item_obj=item.objects.filter(item_name__contains=itemname)
+         category_obj = category.objects.all()
+         subcategory_obj = subcategory.objects.all()
+         return render(request, "adm/view_item.html", {'data': category_obj, 'data1': subcategory_obj, 'data2': item_obj})
+
+    category_obj = category.objects.all()
+    subcategory_obj = subcategory.objects.all()
+
+    item_obj = item.objects.all()
+    return render(request,"adm/view_item.html"  ,{'data' :category_obj ,'data1':subcategory_obj , 'data2' : item_obj})
+
+def adm_deleteitem(request,id):
+    item_obj= item.objects.get(id=id)
+    item_obj.delete()
+    return adm_view_item(request)
+
+def adm_view_order_details(request):
+     order_master_obj=order_master.objects.all()
+    # # data = {'status': 'ok'}
+    # # return JsonResponse(data)
+    # #
+    #
+    # return render(request,"adm/view_order_details.html",)
+
+
+
+def adm_view_rating(request,id):
+
+    rating_obj = rating.objects.filter(ITEM_ID_id=id)
+    return render(request,"adm/view_rating.html",{'data':rating_obj})
+
+def adm_view_subcategory(request):
+    if request.method=="POST":
+        categoryid=request.POST['category']
+        subcategory_obj=subcategory.objects.filter(CATEGORY_ID=category.objects.get(pk=categoryid))
+        category_obj=category.objects.all()
+        return render(request,"adm/view_subcategory.html" ,{'data' : subcategory_obj, 'data1' :category_obj})
+    subcategory_obj=subcategory.objects.all()
+    category_obj=category.objects.all()
+    return render(request, "adm/view_subcategory.html", {'data': subcategory_obj,'data1': category_obj})
+def adm_deletesubcategory(request,id):
+    subcategory_obj = subcategory.objects.get(id=id)
+    subcategory_obj.delete()
+    return adm_view_subcategory(request)
+
+
+def adm_home(request):
+    return render(request,"adm/homepage.html")
+
+def adt(request):
+    return render(request,"index.html")
+
+
+
+
+
+
+
+
+
+def b_view_item(request):
+    if request.method == "POST":
+        btn = request.POST['button']
+        if btn == "Search":
+
+            subcatid = request.POST['subcategory']
+            subcategory_obj = subcategory.objects.get(id=subcatid)
+            item_obj = item.objects.filter(SUBCATEGORY_ID=subcategory_obj)
+        else:
+            itemname = request.POST['item']
+            item_obj = item.objects.filter(item_name__contains=itemname)
+        category_obj = category.objects.all()
+        subcategory_obj = subcategory.objects.all()
+        return render(request, "branch_manager/b_view_item.html",
+                      {'data': category_obj, 'data1': subcategory_obj, 'data2': item_obj})
+
+    category_obj = category.objects.all()
+    subcategory_obj = subcategory.objects.all()
+
+    item_obj = item.objects.all()
+    return render(request, "branch_manager/b_view_item.html", {'data': category_obj, 'data1': subcategory_obj, 'data2': item_obj})
+
+
+
+
+
+
+def b_view_order(request):
+    order_master_obj = order_master.objects.filter(Q(status='pending')|Q(status='approved'))
+    return render(request,"branch_manager/b_view_order.html ",{'data':order_master_obj})
+
+
+def b_accept_request(request,id):
+    order_master_obj = order_master.objects.get(id=id)
+    order_master_obj.status='approved'
+    order_master_obj.save()
+    return b_view_order(request)
+
+
+def b_reject_request(request,id):
+    order_master_obj = order_master.objects.get(id=id)
+    order_master_obj.status='reject'
+    order_master_obj.save()
+    return b_view_order(request)
+
+
+def b_purchased_items(request,id):
+    request.session['om_id']=id
+    order_sub_obj=order_sub.objects.filter(ORDER_MASTER_ID_id=id)
+    order_master_obj = order_master.objects.get(id=id)
+    return render(request,"branch_manager/b_purchased_items.html",{'data':order_sub_obj,
+                'cust_name':order_master_obj.CUSTOMER_ID.name,'date':order_master_obj.date,'tot':order_master_obj.total_amount,'oid':order_master_obj.id,'status':order_master_obj.status})
+
+
+
+
+
+
+def b_damage_entry(request,id):
+   request.session['itemid']=id
+   return render(request,"branch_manager/b_damage_entry.html")
+def b_damage_entry_post(request):
+    id=request.session['itemid']
+    amt = request.POST['amount']
+    dam = request.POST['damage']
+    order_sub_obj = order_sub.objects.get(id=id)
+    dam_obj = damage()
+    dam_obj.order_sub_ID = order_sub_obj
+    dam_obj.damage = dam
+    dam_obj.amount = amt
+    dam_obj.save()
+    om_id= request.session['om_id']
+    return  b_purchased_items(request,om_id)
+
+
+
+def b_stock_updating(request,id):
+    res = item.objects.get(id=id)
+    return render(request,"branch_manager/b_stock_updating.html",{'data':res,'itemid':id })
+
+def stock_add(request):
+    if request.method=="POST":
+
+        branch_id=request.session['manager_branch_id']
+        brnch_obj=branch.objects.get(id=branch_id)
+        itemid=request.POST["itemid"]
+        item_obj=item.objects.get(id=itemid)
+        nqty=request.POST['new_qty']
+
+
+        stock_obj=stock()
+
+        stock_obj.quantity=nqty
+
+        stock_obj.BRANCH_ID=brnch_obj
+        stock_obj.ITEM_ID=item_obj
+        stock_obj.save()
+        text = "<script>alert('Stock Updated');window.location='/myapp/branch_manager_b_view_item/';</script>"
+        return HttpResponse(text)
+
+        return render(request,"branch_manager/b_stock_updating.html")
+
+
+def b_view_complaint(request):
+    return render(request,"branch_manager/b_view_complaint.html ")
+
+
+def b_replay(request):
+    return render (request,"branch_manager/b_replay.html")
+
+def managerhome(request):
+    return render(request,"branch_manager/managerhome")
+
+def ads(request):
+    return render(request,"manager_index.html")
+
+
+
+
+
+
+
+def and_login(request):
+    print("ooooo")
+    username=request.POST['username']
+    password=request.POST['password']
+
+    login_obj = login.objects.filter(username=username, password=password, usertype="user")
+    if login_obj.exists():
+        lg=login_obj[0]
+        return JsonResponse({'status': 'ok','lid':lg.id})
+    else:
+        return JsonResponse({'status': 'no'})
+
+
+def and_registration(request):
+    print("gh")
+    if request.method=="POST":
+        print("qqq")
+        print("ii")
+
+        name = request.POST['name']
+
+        place = request.POST['place']
+        city = request.POST['city']
+        phone = request.POST['phone']
+        email = request.POST['email']
+        password = request.POST['password']
+
+
+
+        login_obj = login()
+        login_obj.username = email
+        login_obj.password = password
+        login_obj.usertype = 'user'
+        login_obj.save()
+
+        customer_obj = customer()
+        customer_obj.name = name
+        customer_obj.city = city
+        customer_obj.place = place
+
+        customer_obj.phone_number = phone
+        customer_obj.email = email
+
+        customer_obj.LOGIN_ID = login_obj
+
+        customer_obj.save()
+        data={'status': 'ok'}
+    return JsonResponse(data)
+
+
+
+def view_userprofile(request):
+    lid = request.POST['lid']
+
+
+    customer_obj = customer.objects.get(LOGIN_ID=login.objects.get(id=lid))
+
+
+
+    return JsonResponse({'status':'ok','name':customer_obj.name,'place':customer_obj.place,'city':customer_obj.city,
+
+                         'phone':customer_obj.phone_number,})
+
+
+def and_view_category(request):
+    category_obj = category.objects.all()
+    ar = []
+    for i in category_obj:
+        s={'id':i.id,'category_name':i.category_name}
+        ar.append(s)
+    return JsonResponse({'status': 'ok', 'data': ar})
+
+
+def and_view_subcategory(request):
+    catid=request.POST['category']
+    category_obj=category.objects.get(id=catid)
+    subcategory_obj=subcategory.objects.filter(CATEGORY_ID=category_obj)
+    ar=[]
+    for i in subcategory_obj:
+        s = {'id': i.id, 'subcategory_name': i.subcategory_name}
+        ar.append(s)
+    return JsonResponse({'status': 'ok', 'data': ar})
+
+
+
+
+def and_view_item(request):
+    subcatid=request.POST['subcategory']
+    subcategory_obj=subcategory.objects.get(id=subcatid)
+    # itemname = request.POST['item']
+    item_obj=item.objects.filter(SUBCATEGORY_ID=subcategory_obj)
+    ar=[]
+    for i in item_obj:
+        s={'item_name': i.item_name, 'item_price': i.item_price, 'id': i.id,
+                'item_image': i.item_image}
+        ar.append(s)
+    return JsonResponse({'status': 'ok', 'data' :ar})
+
+def and_serach_view_item(request):
+    subcatid = request.POST['subcategory']
+    subcategory_obj = subcategory.objects.get(id=subcatid)
+    itemname = request.POST['item']
+    item_obj = item.objects.filter(SUBCATEGORY_ID=subcategory_obj,item_name__contains=itemname)
+    ar = []
+    for i in item_obj:
+        s = {'item_name': i.item_name, 'item_price': i.item_price, 'id': i.id,
+             'item_image': i.item_image}
+        ar.append(s)
+    return JsonResponse({'status': 'ok', 'data': ar})
+
+def and_serach_item(request):
+
+    itemname = request.POST['item']
+    item_obj = item.objects.filter(item_name__contains=itemname)
+    ar = []
+    for i in item_obj:
+        s = {'item_name': i.item_name, 'item_price': i.item_price, 'id': i.id,
+             'item_image': i.item_image}
+        ar.append(s)
+    return JsonResponse({'status': 'ok', 'data': ar})
+
+
+def and_all_view_item(request):
+    item_obj=item.objects.all()
+    ar = []
+    for i in item_obj:
+        s = {'item_name': i.item_name, 'item_price': i.item_price, 'id': i.id,
+             'item_image': i.item_image}
+        ar.append(s)
+    return JsonResponse({'status': 'ok', 'data': ar})
+def add_quantity(request):
+    qnty = request.POST['quantity']
+    print(qnty)
+    itemid=request.POST['ITEM_ID']
+    print(itemid)
+    lid=request.POST['lid']
+    print(lid)
+
+    # log_obj=login.objects.get(lid)
+    # print(log_obj)
+    customer_obj=customer.objects.get(LOGIN_ID_id=lid)
+
+
+    cart_obj=cart()
+    cart_obj.CUSTOMER_ID=customer_obj
+    cart_obj.ITEM_ID_id=itemid
+    cart_obj.quantity=qnty
+    cart_obj.save()
+
+
+
+
+    data = {'status': 'ok'}
+    return JsonResponse(data)
+
+
+
+def view_cart(request):
+    lid = request.POST['lid']
+    log_obj = login.objects.get(id=lid)
+    customer_obj = customer.objects.get(LOGIN_ID=log_obj)
+
+    cart_obj=cart.objects.filter(CUSTOMER_ID=customer_obj)
+    ar = []
+    for i in cart_obj:
+        s = {'item_name': i.ITEM_ID.item_name, 'item_price': i.ITEM_ID.item_price, 'id': i.id,
+             'item_image': i.ITEM_ID.item_image, 'quantity':i.quantity}
+        ar.append(s)
+    if len(ar)>0:
+        return JsonResponse({'status': 'ok', 'data': ar})
+    else:
+        return JsonResponse({'status': 'no'})
+
+
+def view_myorder(request):
+    lid = request.POST['lid']
+    log_obj = login.objects.get(id=lid)
+    customer_obj = customer.objects.get(LOGIN_ID=log_obj)
+
+    order_master_obj = order_master.objects.filter(CUSTOMER_ID=customer_obj)
+    ar = []
+    for i in order_master_obj:
+        s = {'orderdate': i.date, 'status': i.status, 'id': i.id,
+             'total_amount': i.total_amount}
+        ar.append(s)
+    if len(ar) > 0:
+        return JsonResponse({'status': 'ok', 'data': ar})
+    else:
+        return JsonResponse({'status': 'no'})
+
+
+def and_purchased_items(request):
+    id=request.POST['id']
+    order_sub_obj=order_sub.objects.filter(ORDER_MASTER_ID_id=id)
+    ar = []
+    for i in order_sub_obj:
+        damage_obj = damage.objects.filter(order_sub_ID=i)
+        if damage_obj.exists():
+            s = {'id':i.id,'name': i.ITEM_ID.item_name, 'price': i.ITEM_ID.item_price, 'image': i.ITEM_ID.item_image,
+                'quantity': i.quantity,'stat':'yes'}
+        else:
+            s = {'id': i.id, 'name': i.ITEM_ID.item_name, 'price': i.ITEM_ID.item_price, 'image': i.ITEM_ID.item_image,
+                 'quantity': i.quantity, 'stat': 'no'}
+        ar.append(s)
+    if len(ar) > 0:
+        return JsonResponse({'status': 'ok', 'data': ar})
+    else:
+        return JsonResponse({'status': 'no'})
+
+
+def and_view_damage(request):
+    id = request.POST['id']
+    damage_obj = damage.objects.filter(order_sub_ID_id=id)
+    ar = []
+    for i in damage_obj:
+        s = {'description': i.damage, 'amount': i.amount}
+        ar.append(s)
+    if len(ar) > 0:
+        return JsonResponse({'status': 'ok', 'data': ar})
+    else:
+        return JsonResponse({'status': 'no'})
+
+
+def delete_cart(request):
+    cart_id=request.POST['cartid']
+    cart_obj=cart.objects.get(id=cart_id)
+    cart_obj.delete()
+    return JsonResponse({'status': 'ok'})
+# def adm_a_view_subcategory(request):
+#     subcategory_obj=subcategory.objects.filter()
+#     return render(request,"adm/Add_item.html",{'data':subcategory_obj})
+
+
+def adm_view_items(request):
+     collect=request.POST['collected_date']
+     returned=request.POST['return_date']
+     lid=request.POST['lid']
+     log_obj = login.objects.get(id=lid)
+     customer_obj = customer.objects.get(LOGIN_ID=log_obj)
+
+     cart_obj = cart.objects.filter(CUSTOMER_ID=customer_obj)
+     total=0
+     for i in cart_obj:
+         qty=i.quantity
+         price=i.ITEM_ID.item_price
+         total+=int(qty)*int(price)
+     orm=order_master()
+     orm.date=datetime.datetime.now().date()
+     orm.status="pending"
+     orm.collected_date=collect
+     orm.return_date=returned
+     orm.CUSTOMER_ID=customer_obj
+     orm.total_amount=total
+     orm.save()
+     for i in cart_obj:
+         ors=order_sub()
+         ors.quantity=i.quantity
+         ors.ITEM_ID=i.ITEM_ID
+         ors.ORDER_MASTER_ID=orm
+         ors.save()
+         i.delete()
+     data = {'status': 'ok'}
+     return JsonResponse(data)
+
+
+def and_addrating(request):
+    lid = request.POST['lid']
+    log_obj = login.objects.get(id=lid)
+    customer_obj = customer.objects.get(LOGIN_ID=log_obj)
+    itemid = request.POST['ITEM_ID']
+    rat=request.POST['rating']
+    review=request.POST['review']
+    rate_obj=rating.objects.filter(CUSTOMER_ID=customer_obj,ITEM_ID_id=itemid)
+    if rate_obj.exists():
+        rate_obj=rate_obj[0]
+        rate_obj.rating = rat
+        rate_obj.review = review
+        rate_obj.save()
+    else:
+
+
+        rating_obj=rating()
+        rating_obj.ITEM_ID_id=itemid
+        rating_obj.CUSTOMER_ID=customer_obj
+        rating_obj.rating=rat
+        rating_obj.review=review
+        rating_obj.save()
+    return JsonResponse({'status': 'ok'})
+
+
+def and_viewrating(request):
+    itemid=request.POST['ITEM_ID']
+    rating_obj =rating.objects.filter(ITEM_ID_id=itemid)
+    ar=[]
+    for i in rating_obj:
+        s = {'name': i.CUSTOMER_ID.name, 'rating': i.rating,'review':i.review}
+        ar.append(s)
+    if len(ar) > 0:
+        return JsonResponse({'status': 'ok', 'data': ar})
+    else:
+        return JsonResponse({'status': 'no'})
+
+
+
+
+
+
+

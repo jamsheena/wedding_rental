@@ -1,0 +1,10 @@
+
+ def damge_entry(request,id):
+  amt=request.POST['textfield'] 
+  dam=request.POST['textfield2']
+  order_sub_obj=order_sub.objects.get(id=id)
+  dam_obj=damage()
+  dam_obj.ORDER_SUB=order_sub_obj
+  dam_obj.damage=dam
+  dam_obj.amount=amt
+  dam_obj.save()

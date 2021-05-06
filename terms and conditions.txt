@@ -1,0 +1,200 @@
+package com.example.weddingrental;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.app.DatePickerDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+public class termsanddate extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener, View.OnClickListener {
+    EditText ed1,ed2;
+    Button bt1;
+    CheckBox cb1;
+    TextView sc1;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_termsanddate);
+        ed1=(EditText)findViewById(R.id.editTextTextPersonName17);
+        ed2=(EditText)findViewById(R.id.editTextTextPersonName25);
+        bt1=(Button) findViewById(R.id.button10);
+        bt1.setEnabled(false);
+        bt1.setOnClickListener(this);
+        cb1=(CheckBox) findViewById(R.id.checkBox);
+        cb1.setOnCheckedChangeListener(this);
+        sc1=(TextView)findViewById(R.id.textView12);
+        final Calendar myCalendar = Calendar.getInstance();
+
+
+
+
+
+
+        ed1.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                func();
+            }
+        });
+        ed2.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                func2();
+            }
+        });
+
+
+        sc1.setText("gfhgjghsghhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhfghhhhhhhhhhhhhhhhhhhfjjjjjjjjjjj");
+    }
+
+    public void func(){
+        final Calendar myCalendar = Calendar.getInstance();
+        final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
+
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear,
+                                  int dayOfMonth) {
+                // TODO Auto-generated method stub
+                myCalendar.set(Calendar.YEAR, year);
+                myCalendar.set(Calendar.MONTH, monthOfYear);
+                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                String myFormat = "yyyy-MM-dd"; //In which you need put here
+                SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+                ed1.setText(sdf.format(myCalendar.getTime()));
+
+            }
+        };
+        // TODO Auto-generated method stub
+        new DatePickerDialog(termsanddate.this, date, myCalendar
+                .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+    }
+
+    public void func2(){
+        final Calendar myCalendar = Calendar.getInstance();
+        final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
+
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear,
+                                  int dayOfMonth) {
+                // TODO Auto-generated method stub
+                myCalendar.set(Calendar.YEAR, year);
+                myCalendar.set(Calendar.MONTH, monthOfYear);
+                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                String myFormat = "yyyy-MM-dd"; //In which you need put here
+                SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+                ed2.setText(sdf.format(myCalendar.getTime()));
+
+            }
+        };
+        // TODO Auto-generated method stub
+        new DatePickerDialog(termsanddate.this, date, myCalendar
+                .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+        if(b==true){
+            bt1.setEnabled(true);
+        }
+        if(b==false){
+            bt1.setEnabled(false);
+        }
+    }
+
+
+
+
+    @Override
+    public void onClick(View view) {
+        final String collected =ed1.getText().toString();
+        final String returned=ed2.getText().toString();
+        SharedPreferences sh = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        final String hu = sh.getString("ip", "");
+        String url = "http://" + hu + ":8000/myapp/adm_view_items/";
+        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        //  Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
+
+                        // response
+                        try {
+                            JSONObject jsonObj = new JSONObject(response);
+                            if (jsonObj.getString("status").equalsIgnoreCase("ok")) {
+                                Toast.makeText(getApplicationContext(), "success", Toast.LENGTH_SHORT).show();
+
+                                Intent i = new Intent(getApplicationContext(), viewcart.class);
+                                startActivity(i);
+                            }
+                        }
+                        catch (Exception e) {
+                            Toast.makeText(getApplicationContext(), "Error" + e.getMessage().toString(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // error
+                        Toast.makeText(getApplicationContext(), "eeeee" + error.toString(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                SharedPreferences sh = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                Map<String, String> params = new HashMap<String, String>();
+
+
+                params.put("lid", sh.getString("lid",""));
+                params.put("return_date", returned);
+                params.put("collected_date", collected);
+
+
+                return params;
+            }
+        };
+        int MY_SOCKET_TIMEOUT_MS = 100000;
+
+        postRequest.setRetryPolicy(new DefaultRetryPolicy(
+                MY_SOCKET_TIMEOUT_MS,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        requestQueue.add(postRequest);
+
+    }
+}
