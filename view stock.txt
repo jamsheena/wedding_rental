@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Untitled Document</title>
+<h1 align="center"> View Item</h1>
+
+</head>
+
+<body>
+<form action="" method="get">
+<table width="200" border="2" align="center">
+  <tr>
+    <td><strong>Item</strong></td>
+    <td><select  name="category" id="select" class="btn btn-primary">
+        
+          <option value=</option>
+         
+    </select></td>
+  </tr>
+  
+</table>
+<table width="200" border="2" align="center">
+  <tr>
+    <td> <strong>Sl.No </strong></td>
+    <td><strong>Branch Name</strong></td>
+    <td><strong>Phone Nnumber</strong></td>
+     <td><strong>Place</strong></td>
+      <td><strong>Current Stock</strong></td>
+      
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+     <td>&nbsp;</td>
+      <td>&nbsp;</td>
+       <td>&nbsp;</td>
+        <td>&nbsp;</td>
+         <td>&nbsp;</td>
+          <td>&nbsp;</td>
+         
+  </tr>
+</table>
+
+
+
+</form>
+</body>
+</html>

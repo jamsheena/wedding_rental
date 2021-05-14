@@ -1,0 +1,51 @@
+{% extends "index.html" %}
+{% block body %}
+<h1 align="center">View Order Details</h1>
+    <br>
+    <br>
+    <br>
+    <br>
+
+
+<form action="/myapp/adm_view_order_details/" method="post">
+<table class="pull-right">
+  <tr>
+    <th height="64" scope="row"> <strong>From</strong></th>
+    <td><input name="search" type="date" /></td>
+    <th height="64" scope="row"> <strong>To</strong></th>
+    <td><input name="search1" type="date" /></td>
+    <td><input name="submit" type="submit" value="Search" class="btn btn-primary"/></td>
+
+  </tr>
+</table>
+<table  class="table table-bordered">
+  <tr>
+    <td> <strong>Sl.No </strong></td>
+    <td><strong>Customer</strong></td>
+    <td><strong>Date</strong></td>
+     <td><strong>Total Amount</strong></td>
+       <td><strong>Collected date</strong></td>
+      <td><strong>Return Date</strong></td>
+       <td><strong>Branch Name</strong></td>
+
+  </tr>
+
+   {% for i in data %}
+  <tr>
+    <td>&nbsp;{{ forloop.counter }}</td>
+        <td>&nbsp;{{ i.CUSTOMER_ID.name }}</td>
+       <td>&nbsp;{{ i.date }}</td>
+       <td>&nbsp;{{ i.total_amount }}</td>
+       <td>&nbsp;{{ i.collected_date }}</td>
+       <td>&nbsp;{{ i.return_date }}</td>
+       <td>&nbsp;{{ i.BRANCH_ID.branch_name }}</td>
+
+</tr>
+   {% endfor %}
+</table>
+
+
+
+
+</form>
+{% endblock %}
